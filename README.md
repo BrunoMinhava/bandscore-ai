@@ -1,5 +1,10 @@
 # BandScore AI
 
+[![CI](https://github.com/BrunoMinhava/bandscore-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/BrunoMinhava/bandscore-ai/actions/workflows/ci.yml)
+[![Licença: MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-blue.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org)
+[![Offline](https://img.shields.io/badge/processamento-100%25%20local-success.svg)](#)
+
 Aplicação desktop para **reconhecimento, edição, separação e gestão de partituras**,
 pensada para bandas filarmónicas, orquestras, conservatórios e escolas de música.
 
@@ -112,7 +117,7 @@ estiverem noutro sítio, indique o caminho por variável de ambiente:
 ### Arranque
 
 ```bash
-git clone https://github.com/<utilizador>/bandscore-ai.git
+git clone https://github.com/BrunoMinhava/bandscore-ai.git
 cd bandscore-ai
 
 # Backend
