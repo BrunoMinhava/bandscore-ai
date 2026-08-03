@@ -1,141 +1,141 @@
 # BandScore AI
 
 [![CI](https://github.com/BrunoMinhava/bandscore-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/BrunoMinhava/bandscore-ai/actions/workflows/ci.yml)
-[![Licença: MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org)
-[![Offline](https://img.shields.io/badge/processamento-100%25%20local-success.svg)](#)
+[![Offline](https://img.shields.io/badge/processing-100%25%20local-success.svg)](#)
 
-Aplicação desktop para **reconhecimento, edição, separação e gestão de partituras**,
-pensada para bandas filarmónicas, orquestras, conservatórios e escolas de música.
+Desktop application for **optical music recognition, editing, part separation and score
+management**, built for concert bands, orchestras, conservatories and music schools.
 
-Transforma um PDF, uma digitalização ou uma fotografia de uma partitura de maestro
-numa **representação digital completa**, identifica os instrumentos, separa as partes
-e exporta o papel individual de cada músico.
+It turns a PDF, a scan or a photograph of a conductor's score into a **complete digital
+representation**, identifies the instruments, separates the parts and exports the
+individual sheet each musician plays from.
 
-**Funciona inteiramente offline.** Todo o processamento corre na máquina local: não há
-chamadas a serviços externos, nem APIs pagas, nem envio de partituras para a nuvem.
-
----
-
-> ### ⚠️ Projeto em desenvolvimento ativo
->
-> Esta é uma versão **v0.1 em curso**, não um produto acabado. O que está descrito
-> aqui funciona e foi medido em partituras reais, mas o reconhecimento **não é 100%
-> fiável** e o resultado precisa sempre de revisão humana.
->
-> **O que já funciona bem:** partituras digitalizadas a 300 DPI ou PDFs de boa
-> qualidade, separação por instrumento, exportação nos sete formatos, identificação
-> automática dos instrumentos e deteção dos compassos duvidosos.
->
-> **O que ainda falha:** fotografias de telemóvel de partituras de maestro grandes
-> (ver [Limitações conhecidas](#limitações-conhecidas)); partituras antigas sem nomes
-> impressos nas pautas; e cerca de **14% dos compassos** de uma partitura A3 real
-> ficaram assinalados como leitura duvidosa — a aplicação diz quais, mas a correção
-> é manual. A edição nota a nota ainda não existe.
->
-> Por isso a aplicação **mostra sempre onde não confia**, em vez de apresentar o
-> resultado como certo. Ver [Qualidade do reconhecimento](#qualidade-do-reconhecimento).
+**Runs entirely offline.** All processing happens on the local machine: no external
+services, no paid APIs, and no scores leaving the computer.
 
 ---
 
-## Índice
+> ### ⚠️ Work in progress
+>
+> This is an **ongoing v0.1**, not a finished product. What is described here works and
+> was measured on real scores, but recognition is **not 100% reliable** and the output
+> always needs human review.
+>
+> **What already works well:** scores digitised at 300 DPI or good-quality PDFs, part
+> separation, export to all seven formats, automatic instrument identification, and
+> flagging of uncertain measures.
+>
+> **What still fails:** phone photographs of large conductor's scores (see
+> [Known limitations](#known-limitations)); older scores with no instrument names printed
+> on the staves; and roughly **14% of the measures** in a real A3 score ended up flagged
+> as uncertain — the application tells you which ones, but correcting them is manual.
+> Note-level editing does not exist yet.
+>
+> This is why the application **always shows where it is not confident**, instead of
+> presenting the result as correct. See [Recognition quality](#recognition-quality).
 
-- [O que faz](#o-que-faz)
-- [Como funciona](#como-funciona)
-- [Instalação](#instalação)
-- [Utilização](#utilização)
-- [Arquitetura](#arquitetura)
-- [Decisões de engenharia](#decisões-de-engenharia)
-- [Qualidade do reconhecimento](#qualidade-do-reconhecimento)
-- [Desempenho](#desempenho)
-- [Testes e verificação](#testes-e-verificação)
-- [Limitações conhecidas](#limitações-conhecidas)
+---
+
+## Table of contents
+
+- [What it does](#what-it-does)
+- [How it works](#how-it-works)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Architecture](#architecture)
+- [Engineering decisions](#engineering-decisions)
+- [Recognition quality](#recognition-quality)
+- [Performance](#performance)
+- [Testing and verification](#testing-and-verification)
+- [Known limitations](#known-limitations)
 - [Roadmap](#roadmap)
 
 ---
 
-## O que faz
+## What it does
 
-| Etapa | Descrição |
+| Stage | Description |
 |---|---|
-| **Importar** | PDF, PNG, JPG, JPEG, BMP, TIFF, MusicXML, MXL e MSCZ. Os PDFs são rasterizados na resolução que o motor de reconhecimento precisa, calculada por sondagem. |
-| **Reconhecer** | Correção automática das imagens e reconhecimento ótico musical num só passo, com barra de progresso e tempo estimado. |
-| **Separar** | Instrumentos identificados e agrupados por família, com os compassos de leitura duvidosa assinalados. Clicar num instrumento mostra o seu papel individual. |
-| **Exportar** | Obra completa ou um ficheiro por instrumento, em PDF, MusicXML, MXL, MSCZ, MIDI, PNG e SVG. |
-| **Editar** | Visualização da partitura com zoom e desfazer. |
-| **Reproduzir** | Áudio com misturador por instrumento, andamento variável, ciclo e metrónomo. |
-| **Biblioteca** | Arquivo pesquisável por compositor, obra, instrumento, dificuldade, formação, ano e editor. |
+| **Import** | PDF, PNG, JPG, JPEG, BMP, TIFF, MusicXML, MXL and MSCZ. PDFs are rasterised at the resolution the recognition engine actually needs, determined by probing the page. |
+| **Recognise** | Image correction and optical music recognition in a single step, with a progress bar and estimated time remaining. |
+| **Separate** | Instruments identified and grouped by family, with uncertain measures flagged per part. Clicking an instrument shows its individual sheet. |
+| **Export** | Full score or one file per instrument, as PDF, MusicXML, MXL, MSCZ, MIDI, PNG and SVG. |
+| **Edit** | Score rendering with zoom and undo. |
+| **Play** | Audio playback with a per-instrument mixer, variable tempo, looping and a metronome. |
+| **Library** | Searchable archive by composer, title, instrument, difficulty, ensemble, year and publisher. |
 
-### O que é reconhecido
+### What gets recognised
 
-Pautas, sistemas e instrumentos · notas, pausas e acordes · claves, armaduras e compassos
-· ligaduras de expressão e de prolongação · quiálteras (tercinas, sextinas) com o número
-e o lado corretos · dinâmicas (`p`, `f`, `sf`, …) e forquilhas de crescendo/diminuendo ·
-articulações (staccato, acento, tenuto, fermata) · andamentos e textos · repetições,
-**Da Capo**, **Dal Segno**, **Coda** e **Fine**.
+Staves, systems and instruments · notes, rests and chords · clefs, key and time signatures
+· slurs and ties · tuplets (triplets, sextuplets) with the correct number and placement ·
+dynamics (`p`, `f`, `sf`, …) and crescendo/diminuendo hairpins · articulations (staccato,
+accent, tenuto, fermata) · tempo marks and text · repeats, **Da Capo**, **Dal Segno**,
+**Coda** and **Fine**.
 
 ---
 
-## Como funciona
+## How it works
 
 ```mermaid
 flowchart TB
-  subgraph Entrada
-    PDF[PDF] --> RAS[Rasterização<br/>com DPI adaptativo]
-    IMG[Fotografia / Scan] --> PRE
+  subgraph Input
+    PDF[PDF] --> RAS[Rasterisation<br/>adaptive DPI]
+    IMG[Photo / Scan] --> PRE
     XML[MusicXML / MSCZ] --> ENG
     RAS --> PRE
   end
 
-  subgraph PRE[Preparação da imagem]
-    O[Orientação] --> P[Perspetiva] --> S[Sombras] --> N[Ruído]
-    N --> C[Contraste] --> D[Rotação] --> E[Escala pela altura da pauta]
-    E --> DP[Divisão de páginas duplas]
+  subgraph PRE[Image preparation]
+    O[Orientation] --> P[Perspective] --> S[Shadows] --> N[Noise]
+    N --> C[Contrast] --> D[Deskew] --> E[Scale by staff height]
+    E --> DP[Double-page split]
   end
 
   PRE --> OMR
 
-  subgraph OMR[Reconhecimento ótico]
-    AUD[Audiveris em paralelo<br/>com cache por conteúdo]
-    OCR[OCR dos nomes<br/>dos instrumentos]
+  subgraph OMR[Optical music recognition]
+    AUD[Audiveris in parallel<br/>with content-hash cache]
+    OCR[OCR of printed<br/>instrument names]
   end
 
   OMR --> ENG
 
-  subgraph ENG[Motor musical]
-    MOD[Modelo interno ScoreDoc]
-    INS[Identificação de instrumentos]
-    TUP[Normalização de quiálteras]
-    CONF[Análise de confiança]
+  subgraph ENG[Music engine]
+    MOD[Internal ScoreDoc model]
+    INS[Instrument identification]
+    TUP[Tuplet normalisation]
+    CONF[Confidence analysis]
   end
 
-  ENG --> VAL[Validação cruzada<br/>entre pautas]
-  ENG --> EXP[Exportação]
-  ENG --> LIB[(Biblioteca SQLite)]
+  ENG --> VAL[Cross-staff<br/>validation]
+  ENG --> EXP[Export]
+  ENG --> LIB[(SQLite library)]
 ```
 
 ---
 
-## Instalação
+## Installation
 
-### Requisitos
+### Requirements
 
-- **Python 3.11+** e **Node.js 20+**
-- **Audiveris** — motor de reconhecimento ótico musical *(obrigatório para reconhecer)*
-- **MuseScore 4** — conversão para PDF, MSCZ, PNG e SVG *(obrigatório para exportar nesses formatos)*
-- **Tesseract** — leitura dos nomes dos instrumentos *(opcional, melhora a identificação)*
+- **Python 3.11+** and **Node.js 20+**
+- **Audiveris** — optical music recognition engine *(required for recognition)*
+- **MuseScore 4** — conversion to PDF, MSCZ, PNG and SVG *(required for those formats)*
+- **Tesseract** — reading printed instrument names *(optional, improves identification)*
 
-| Ferramenta | macOS | Linux / Windows |
+| Tool | macOS | Linux / Windows |
 |---|---|---|
-| Audiveris | Descarregar o `.dmg` das [releases](https://github.com/Audiveris/audiveris/releases) e colocar em `/Applications` | `.deb` / `.msi` das mesmas releases |
+| Audiveris | Download the `.dmg` from [releases](https://github.com/Audiveris/audiveris/releases) and place it in `/Applications` | `.deb` / `.msi` from the same releases |
 | MuseScore | `brew install --cask musescore` | [musescore.org](https://musescore.org) |
 | Tesseract | `brew install tesseract` | `apt install tesseract-ocr` |
 
-A aplicação deteta as três automaticamente e mostra o estado na barra lateral. Se
-estiverem noutro sítio, indique o caminho por variável de ambiente:
-`BANDSCORE_AUDIVERIS`, `BANDSCORE_MUSESCORE`, `BANDSCORE_TESSERACT`.
+The application detects all three automatically and shows their status in the sidebar. If
+they live elsewhere, point to them with environment variables: `BANDSCORE_AUDIVERIS`,
+`BANDSCORE_MUSESCORE`, `BANDSCORE_TESSERACT`.
 
-### Arranque
+### Getting started
 
 ```bash
 git clone https://github.com/BrunoMinhava/bandscore-ai.git
@@ -150,236 +150,233 @@ python3.12 -m venv .venv
 cd ../frontend
 npm install
 
-# Arrancar tudo (backend + interface + janela)
+# Start everything (backend + UI + window)
 cd ..
 ./scripts/dev.sh
 ```
 
-### Reconhecimento neuronal (opcional)
+### Neural recognition (optional)
 
 ```bash
 cd backend && .venv/bin/pip install -r requirements-ml.txt
 ```
 
-Modelos de deteção de símbolos em ONNX colocam-se em
-`~/Library/Application Support/BandScoreAI/models/`. O contrato está documentado em
+ONNX symbol-detection models go in `~/Library/Application Support/BandScoreAI/models/`.
+The contract is documented in
 [`app/pipeline/recognition/symbols.py`](backend/app/pipeline/recognition/symbols.py).
-A GPU (CUDA ou Metal) é usada automaticamente quando existe.
+GPU (CUDA or Metal) is used automatically when available.
 
 ---
 
-## Utilização
+## Usage
 
-1. **Novo projeto** ou **Abrir PDF** na página inicial.
-2. **Reconhecer** — prepara as imagens e reconhece a música de seguida, mostrando a
-   percentagem e o tempo que falta.
-3. **Separar** — confirmar os instrumentos identificados. Os que o motor não conseguiu
-   nomear ficam como «Pauta N» e podem ser atribuídos pelo seletor. Clicar numa linha
-   mostra o papel individual desse instrumento.
-4. **Exportar** — escolher instrumentos e formatos. Com «ficheiros individuais», cada
-   instrumento gera o seu próprio PDF (`Obra - Trompete I.pdf`).
+1. **New project** or **Open PDF** from the home screen.
+2. **Recognise** — prepares the images and recognises the music in one go, showing
+   percentage complete and time remaining.
+3. **Separate** — confirm the identified instruments. Staves the engine could not name
+   appear as "Pauta N" and can be assigned from a dropdown. Clicking a row shows that
+   instrument's individual sheet.
+4. **Export** — pick instruments and formats. With "individual files", each instrument
+   produces its own PDF (`Work - Trumpet I.pdf`).
 
-Os dados ficam em `~/Library/Application Support/BandScoreAI/` (macOS),
-`%APPDATA%\BandScoreAI\` (Windows) ou `~/.local/share/BandScoreAI/` (Linux).
+Data lives in `~/Library/Application Support/BandScoreAI/` (macOS),
+`%APPDATA%\BandScoreAI\` (Windows) or `~/.local/share/BandScoreAI/` (Linux).
 
 ---
 
-## Arquitetura
+## Architecture
 
-Monorepo com dois processos que comunicam por HTTP local na porta `8765`.
+A monorepo with two processes communicating over local HTTP on port `8765`.
 
 ```
 bandscore-ai/
 ├── backend/                    Python · FastAPI · SQLite
 │   └── app/
-│       ├── api/                endpoints REST
-│       ├── core/               configuração, base de dados, trabalhos em segundo plano
-│       ├── engine/             modelo musical interno e ponte para music21
+│       ├── api/                REST endpoints
+│       ├── core/               configuration, database, background jobs
+│       ├── engine/             internal music model and music21 bridge
 │       ├── pipeline/
-│       │   ├── preprocessing/  correção de imagem (OpenCV)
-│       │   └── recognition/    Audiveris, instrumentos, confiança, OCR
-│       ├── validation/         verificação e comparação entre pautas
-│       ├── exporters/          MusicXML, MIDI, e MuseScore CLI
-│       └── library/            catálogo pesquisável
+│       │   ├── preprocessing/  image correction (OpenCV)
+│       │   └── recognition/    Audiveris, instruments, confidence, OCR
+│       ├── validation/         verification and cross-staff comparison
+│       ├── exporters/          MusicXML, MIDI, and MuseScore CLI
+│       └── library/            searchable catalogue
 └── frontend/                   Electron · React · TypeScript · Tailwind
-    ├── electron/               processo principal e ponte segura
-    └── src/                    páginas, componentes, cliente da API
+    ├── electron/               main process and secure bridge
+    └── src/                    pages, components, API client
 ```
 
-### Módulos do backend
+> **Note on language:** identifiers, comments and docstrings in the source are written in
+> Portuguese, the working language of the target users (Portuguese concert bands). The
+> documentation and public interfaces are in English.
 
-| Módulo | Responsabilidade |
+### Backend modules
+
+| Module | Responsibility |
 |---|---|
-| `pipeline/preprocessing` | Orientação, perspetiva, sombras, ruído, contraste, rotação, normalização de escala, páginas duplas, deteção de cortes e aferição de qualidade |
-| `pipeline/recognition` | Audiveris em paralelo com cache, junção de páginas, identificação de instrumentos, OCR dos nomes, sistema de confiança |
-| `engine` | Modelo interno completo, conversão de e para MusicXML, navegação musical (repetições, D.C., D.S., Coda, Fine), histórico para desfazer |
-| `validation` | Durações, âmbitos, ligaduras, repetições e **comparação entre pautas** |
-| `exporters` | Obra completa ou partes separadas em sete formatos |
-| `library` | Registo automático das obras reconhecidas, pesquisável |
+| `pipeline/preprocessing` | Orientation, perspective, shadows, noise, contrast, deskew, scale normalisation, double-page splitting, edge-cut detection and quality assessment |
+| `pipeline/recognition` | Parallel Audiveris with caching, page merging, instrument identification, name OCR, confidence system |
+| `engine` | Complete internal model, conversion to and from MusicXML, musical navigation (repeats, D.C., D.S., Coda, Fine), undo history |
+| `validation` | Durations, instrument ranges, ties, repeats and **cross-staff comparison** |
+| `exporters` | Full score or separate parts in seven formats |
+| `library` | Automatic registration of recognised works, searchable |
 
-### O modelo musical
+### The music model
 
-Cada nota do modelo interno guarda altura, oitava, duração, posição, instrumento,
-compasso, página, voz, camada, dinâmica, articulações, ligaduras, forquilha, acidente,
-quiáltera (proporção, delimitação e lado do número), nível de confiança e leituras
-alternativas. É serializado em `score.json` dentro de cada projeto — legível, com
-histórico de versões para desfazer, e independente de qualquer formato externo.
-
----
-
-## Decisões de engenharia
-
-Algumas escolhas não são óbvias e foram tomadas a partir de medições em partituras
-reais. Ficam registadas porque explicam o código.
-
-**A resolução é escolhida pela altura da pauta, não por um DPI fixo.** O que determina
-a qualidade do reconhecimento é a distância entre as linhas da pauta em pixels
-(*interline*), não o DPI. Na importação, uma página de sondagem é rasterizada, mede-se
-a pauta e extrapola-se a resolução certa. Rasterizar o PDF na resolução adequada
-acrescenta detalhe verdadeiro; ampliar uma imagem pequena apenas interpola pixels e
-custa tempo sem ganho.
-
-**O tamanho da folha tem um teto rígido.** O Audiveris ignora silenciosamente folhas
-acima de cerca de 5000 px por lado — não dá erro, limita-se a devolver «Sheet ignored».
-Medido: 3509×4963 passa, 4094×5790 é ignorada. A resolução calculada é limitada para
-nunca ultrapassar esse valor.
-
-**A orientação é decidida por contagem de pautas, nunca por OCR.** O Tesseract oferece
-deteção de rotação, mas numa página de música há pouco texto e ele adivinha: numa
-partitura de 24 páginas devolveu «180°» em 8 delas, que eram viradas ao contrário e
-ficavam ilegíveis. O critério passou a ser a contagem de pautas detetadas em cada
-orientação, que é verificável. Existe um [teste de regressão](backend/tests/test_navigation.py)
-a proteger isto.
-
-**Páginas mal lidas são excluídas, não integradas.** Quando o reconhecimento devolve
-para uma página um número de pautas diferente do resto da obra, essa página foi mal
-interpretada. Juntá-la pela posição despejaria compassos inventados nas primeiras
-pautas e corromperia tudo. É excluída e assinalada ao utilizador.
-
-**Um nome errado é pior do que nenhum.** Na identificação por OCR, `bass` sozinho é
-ambíguo numa banda — *bass clarinet*, *bass drum*, *bass trombone*, *double bass* — e
-gerava Tubas falsas. O alias foi removido: nomes que não têm correspondência segura
-ficam por atribuir, para o utilizador decidir.
-
-**As quiálteras são respeitadas como estão escritas.** A proporção, a delimitação do
-colchete e o lado do número são lidos do original e preservados. Duas tercinas
-contíguas só se tornam uma sextina quando ocupam **exatamente um tempo** — que é a
-assinatura da sextina; duas tercinas de colcheias ocupam dois tempos e continuam duas
-tercinas.
-
-**A barra de compassos é reconstruída pela duração real quando é preciso.** O music21
-não dá erro quando a duração de um compasso não bate com a métrica: devolve
-silenciosamente zero barras de ligação, e a pauta sai com todas as figuras de colchete
-solto. Compassos irregulares passam a ser pautados pela duração do conteúdo, mantendo
-impressa a métrica correta.
+Every note in the internal model carries pitch, octave, duration, position, instrument,
+measure, page, voice, layer, dynamic, articulations, ties, hairpin, accidental, tuplet
+(ratio, bracket span and number placement), confidence level and alternative readings. It
+is serialised to `score.json` inside each project — human-readable, with version history
+for undo, and independent of any external format.
 
 ---
 
-## Qualidade do reconhecimento
+## Engineering decisions
 
-A aplicação não se limita a converter: **verifica-se a si própria** e diz onde não
-confia.
+Some choices are not obvious and were made from measurements on real scores. They are
+recorded here because they explain the code.
 
-**Comparação entre pautas.** Numa partitura de maestro, todas as pautas são
-metricamente idênticas no mesmo compasso. Quando uma discorda das restantes, o erro é
-dela — e a maioria diz qual devia ser o valor. É a fonte de verdade mais forte para
-detetar barras de compasso falhadas, e permite estimar quantas faltam.
+**Resolution is chosen from staff height, not a fixed DPI.** What determines recognition
+quality is the distance between staff lines in pixels (*interline*), not DPI. On import, a
+probe page is rasterised, the staff is measured, and the right resolution is extrapolated.
+Rasterising the PDF at the proper resolution adds real detail; upscaling a small image only
+interpolates pixels and costs time for no gain.
 
-> *Compasso 7: 3,25 tempos, mas 6 de 7 pautas têm 3 — provável 1 barra de compasso em falta*
+**Sheet size has a hard ceiling.** Audiveris silently ignores sheets above roughly 5000 px
+per side — it raises no error, it simply reports "Sheet ignored". Measured: 3509×4963
+passes, 4094×5790 is ignored. The computed resolution is capped so this is never exceeded.
 
-**Âmbito dos instrumentos.** Uma nota fora do âmbito real do instrumento é assinalada
-com a alternativa mais provável (tipicamente um erro de oitava).
+**Orientation is decided by staff count, never by OCR.** Tesseract offers rotation
+detection, but a page of music has little text and it guesses: on a 24-page score it
+returned "180°" for 8 of them, which were then flipped upside down and became unreadable.
+The criterion is now the number of staves detected in each orientation, which is
+verifiable. A [regression test](backend/tests/test_navigation.py) guards this.
 
-**Aferição prévia da imagem.** Antes de gastar minutos, a aplicação mede a pauta e
-recusa imagens sem resolução suficiente, dizendo em português e com números concretos
-o que é preciso:
+**Misread pages are excluded, not merged.** When recognition returns a different number of
+staves for one page than for the rest of the work, that page was misinterpreted. Merging it
+by position would dump invented measures into the first few parts and corrupt everything.
+It is excluded and reported to the user.
 
-> *Imagem com pouca resolução: as linhas da pauta estão a 9,5 pixels de distância e são
-> precisos pelo menos 11. Esta imagem tem 1017×1440 px; para esta partitura seriam
-> precisos cerca de 2141×3031 px.*
+**A wrong name is worse than no name.** In OCR-driven identification, `bass` alone is
+ambiguous in a concert band — *bass clarinet*, *bass drum*, *bass trombone*, *double bass* —
+and produced false tubas. The alias was removed: names without a safe match are left
+unassigned for the user to decide.
 
-Os compassos duvidosos aparecem marcados por instrumento no passo **Separar**, e há um
-botão para aceitar todas as leituras de uma vez em vez de confirmar nota a nota.
+**Tuplets are preserved as written.** The ratio, bracket span and number placement are read
+from the original and kept. Two adjacent triplets only become a sextuplet when they fill
+**exactly one beat** — the signature of a sextuplet; two eighth-note triplets span two
+beats and remain two triplets.
+
+**Beaming is rebuilt from actual duration when needed.** music21 raises no error when a
+measure's duration disagrees with its time signature: it silently returns zero beams, and
+the part comes out with every note flagged individually. Irregular measures are now beamed
+according to their actual content while still printing the correct time signature.
 
 ---
 
-## Desempenho
+## Recognition quality
 
-Medições numa partitura real de banda: 24 páginas A3, 22 instrumentos, num MacBook de
-10 núcleos.
+The application does not merely convert: it **checks itself** and says where it is not
+confident.
 
-| | Antes | Depois |
+**Cross-staff comparison.** In a conductor's score, every staff is metrically identical at
+the same measure. When one disagrees with the rest, the error is that staff's — and the
+majority tells us what the value should have been. This is the strongest available source
+of truth for detecting missed barlines, and it allows estimating how many are missing.
+
+> *Measure 7: 3.25 beats, but 6 of 7 staves have 3 — probably 1 missing barline*
+
+**Instrument ranges.** A note outside an instrument's real range is flagged with the most
+likely alternative (typically an octave error).
+
+**Up-front image assessment.** Before spending minutes, the application measures the staff
+and rejects images without sufficient resolution, stating in concrete numbers what is
+needed:
+
+> *Low resolution for music recognition: staff lines are 9.5 pixels apart and at least 11
+> are required. This image is 1017×1440 px; this score would need roughly 2141×3031 px.*
+
+Uncertain measures are flagged per instrument in the **Separate** step, and a single button
+accepts all readings at once instead of confirming note by note.
+
+---
+
+## Performance
+
+Measured on a real concert-band score: 24 A3 pages, 22 instruments, on a 10-core MacBook.
+
+| | Before | After |
 |---|---|---|
-| Reconhecimento (3 páginas) | 63 s | **28 s** |
-| Obra completa (24 páginas) | ~8,4 min | **3,7 min** |
-| Ciclo completo com preparação | 15+ min | **5,1 min** |
-| Segunda passagem sem alterações | igual | **instantânea** (cache) |
+| Recognition (3 pages) | 63 s | **28 s** |
+| Full work (24 pages) | ~8.4 min | **3.7 min** |
+| Complete cycle including preparation | 15+ min | **5.1 min** |
+| Second pass with no changes | same | **instant** (cache) |
 
-As páginas são processadas em paralelo, com o número de trabalhadores limitado a 4: o
-Audiveris já usa cerca de três núcleos por processo e ocupa perto de 2 GB, por isso um
-processo por núcleo seria contraproducente. O resultado de cada página é guardado por
-*hash* do conteúdo, e páginas inalteradas não voltam a ser processadas.
+Pages are processed in parallel with the worker count capped at 4: Audiveris already uses
+about three cores per process and occupies close to 2 GB, so one process per core would be
+counterproductive. Each page's result is stored under a hash of its content, and unchanged
+pages are never reprocessed.
 
 ---
 
-## Testes e verificação
+## Testing and verification
 
 ```bash
 cd backend
-.venv/bin/python -m pytest        # 19 testes
-.venv/bin/ruff check app tests    # análise estática
+.venv/bin/python -m pytest        # 19 tests
+.venv/bin/ruff check app tests    # static analysis
 
 cd ../frontend
-npx tsc --noEmit                  # TypeScript estrito
+npx tsc --noEmit                  # strict TypeScript
 npm run build
 ```
 
-A cobertura incide sobre a lógica onde um erro é silencioso e caro: navegação musical
-(repetições, D.C., D.S., Coda, Fine, e a regra de que as repetições não se retomam
-depois de um Da Capo), identificação de instrumentos a partir de abreviaturas e de
-texto colado pelo OCR, e a regressão da orientação de página.
+Coverage targets the logic where a mistake is silent and expensive: musical navigation
+(repeats, D.C., D.S., Coda, Fine, and the rule that repeats are not taken again after a Da
+Capo), instrument identification from abbreviations and OCR-mangled text, and the page
+orientation regression.
 
 ---
 
-## Limitações conhecidas
+## Known limitations
 
-São limites reais, medidos, não hipóteses.
+These are measured limits, not hypotheses.
 
-**Fotografias de partituras de maestro.** Uma A3 com 24 instrumentos fotografada com o
-telemóvel produz cerca de 9 pautas legíveis. A folha curva e em perspetiva distorce as
-linhas, e a altura de uma nota lê-se pela posição relativa a essas linhas. Para estas
-partituras, digitalização a 300 DPI. A fotografia funciona bem para **papéis
-individuais**, onde as pautas são poucas e grandes.
+**Photographs of conductor's scores.** An A3 sheet with 24 instruments photographed with a
+phone yields around 9 legible staves. The page curves and sits at an angle, distorting the
+lines — and a note's pitch is read from its position relative to those lines. For such
+scores, scan at 300 DPI. Photography works well for **individual parts**, where staves are
+few and large.
 
-**Correção de curvatura.** Foi implementada e **removida**: numa partitura real, a
-deteção de pautas piorou de 9 para 0, porque os desvios acumulados entre faixas
-verticais geravam uma deriva falsa. Preferiu-se não ter a funcionalidade a tê-la a
-estragar o resultado.
+**Curvature correction.** It was implemented and then **removed**: on a real score, staff
+detection degraded from 9 staves to 0, because accumulated drift between vertical strips
+produced a false displacement. Not having the feature was preferable to having it damage
+the result.
 
-**Partituras antigas sem nomes impressos.** O motor não consegue nomear as pautas e
-elas surgem como «Pauta N». O OCR recupera os nomes quando estão impressos — numa
-página de rosto real identificou 20 de 22 instrumentos — mas nem todas as edições os
-trazem. A atribuição manual está a um clique.
+**Older scores with no printed names.** The engine cannot name the staves and they appear
+as "Pauta N". OCR recovers the names when they are printed — on a real title page it
+identified 20 of 22 instruments — but not every edition prints them. Manual assignment is
+one click away.
 
-**Edição de notas.** O editor mostra a partitura com zoom e permite desfazer; a edição
-nota a nota está no roadmap.
+**Note editing.** The editor renders the score with zoom and supports undo; note-by-note
+editing is on the roadmap.
 
 ---
 
 ## Roadmap
 
-- Edição nota a nota no editor
-- Modelos YOLOv11 treinados em partituras como segunda opinião ao motor principal
-- Reprodução com *soundfont* em vez de síntese
-- Digitalização direta (TWAIN / ICA)
-- Comparação entre edições e deteção de diferenças
-- Transposição automática e redução para piano
-- Reconhecimento de manuscritos
-- Empacotamento com `electron-builder` e backend embutido
+- Note-by-note editing in the editor
+- YOLOv11 models trained on sheet music as a second opinion to the main engine
+- Soundfont-based playback instead of synthesis
+- Direct scanning (TWAIN / ICA)
+- Edition comparison and difference detection
+- Automatic transposition and piano reduction
+- Handwritten manuscript recognition
+- Packaging with `electron-builder` and an embedded backend
 
 ---
 
-## Tecnologias
+## Technologies
 
 **Frontend** — React 18, TypeScript, Tailwind CSS 4, Electron 33, Framer Motion,
 React Query, Zustand, OpenSheetMusicDisplay
@@ -387,14 +384,14 @@ React Query, Zustand, OpenSheetMusicDisplay
 **Backend** — Python 3.12, FastAPI, SQLAlchemy, SQLite, OpenCV, NumPy, PyMuPDF,
 music21, Tesseract
 
-**Reconhecimento** — Audiveris (OMR), MuseScore CLI (conversão), suporte opcional para
-ONNX Runtime, PyTorch e YOLOv11
+**Recognition** — Audiveris (OMR), MuseScore CLI (conversion), optional support for
+ONNX Runtime, PyTorch and YOLOv11
 
 ---
 
-## Licença
+## License
 
-MIT — ver [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
 
-O Audiveris é distribuído sob AGPL e o MuseScore sob GPL. São usados como ferramentas
-externas, invocadas por linha de comandos, e não são redistribuídos com este projeto.
+Audiveris is distributed under AGPL and MuseScore under GPL. They are used as external
+tools, invoked through the command line, and are not redistributed with this project.
