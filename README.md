@@ -17,6 +17,27 @@ chamadas a serviços externos, nem APIs pagas, nem envio de partituras para a nu
 
 ---
 
+> ### ⚠️ Projeto em desenvolvimento ativo
+>
+> Esta é uma versão **v0.1 em curso**, não um produto acabado. O que está descrito
+> aqui funciona e foi medido em partituras reais, mas o reconhecimento **não é 100%
+> fiável** e o resultado precisa sempre de revisão humana.
+>
+> **O que já funciona bem:** partituras digitalizadas a 300 DPI ou PDFs de boa
+> qualidade, separação por instrumento, exportação nos sete formatos, identificação
+> automática dos instrumentos e deteção dos compassos duvidosos.
+>
+> **O que ainda falha:** fotografias de telemóvel de partituras de maestro grandes
+> (ver [Limitações conhecidas](#limitações-conhecidas)); partituras antigas sem nomes
+> impressos nas pautas; e cerca de **14% dos compassos** de uma partitura A3 real
+> ficaram assinalados como leitura duvidosa — a aplicação diz quais, mas a correção
+> é manual. A edição nota a nota ainda não existe.
+>
+> Por isso a aplicação **mostra sempre onde não confia**, em vez de apresentar o
+> resultado como certo. Ver [Qualidade do reconhecimento](#qualidade-do-reconhecimento).
+
+---
+
 ## Índice
 
 - [O que faz](#o-que-faz)
