@@ -1,0 +1,39 @@
+[project]
+name = "bandscore-ai"
+version = "0.1.0"
+description = "Reconhecimento, edição, separação e gestão de partituras para bandas filarmónicas"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "C4", "RUF", "SIM", "PL"]
+ignore = [
+    # Depends(...) em argumentos por omissão é o padrão do FastAPI
+    "B008",
+    # importações dentro de funções são deliberadas: dependências pesadas e
+    # opcionais (torch, cv2, pytesseract, music21) só se carregam se forem
+    # usadas, e algumas evitam importações circulares entre pipeline e API
+    "PLC0415",
+    # o código e os comentários estão em português: acentos, «» e × são
+    # caracteres legítimos, não ambiguidades a corrigir
+    "RUF001", "RUF002", "RUF003",
+    # as chamadas a subprocessos verificam o resultado à mão, para poder
+    # traduzir os erros do Audiveris/MuseScore em mensagens úteis
+    "PLW1510",
+    # os módulos de visão e música usam nomes matemáticos curtos (h, w, m, ts)
+    "E741",
+    "PLR0912", "PLR0913", "PLR0915", "PLR0917", "PLR2004",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["PLR2004", "S101"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning",
+]

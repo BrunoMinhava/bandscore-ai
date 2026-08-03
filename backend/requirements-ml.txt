@@ -1,0 +1,13 @@
+# BandScore AI — dependências opcionais de IA local (pesadas).
+# Instalar apenas quando se quiser usar os detetores de símbolos neuronais:
+#   pip install -r requirements-ml.txt
+torch>=2.3
+torchvision>=0.18
+onnxruntime>=1.18
+ultralytics>=8.2       # YOLOv11
+librosa>=0.10
+
+# tflite-runtime — instalar o wheel específico da plataforma:
+#   https://www.tensorflow.org/lite/guide/python
+# detectron2 — instalar a partir do GitHub:
+#   pip install 'git+https://github.com/facebookresearch/detectron2.git'

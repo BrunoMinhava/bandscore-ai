@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+dist-electron/
+.vite/
+
+# Dados da aplicação (projetos, base de dados, modelos)
+*.sqlite3
+*.db
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# Registos e temporários
+*.log
+.env
+.env.local

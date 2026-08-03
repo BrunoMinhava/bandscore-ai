@@ -1,0 +1,20 @@
+# BandScore AI — dependências principais (processamento 100% local)
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.7
+sqlalchemy>=2.0
+python-multipart>=0.0.9
+httpx>=0.27
+pytest>=8.0
+
+# Visão por computador / imagem
+opencv-python-headless>=4.10
+numpy>=1.26
+pillow>=10.3
+pymupdf>=1.24          # rasterização de PDF (abrir PDFs como imagens)
+pytesseract>=0.3.10    # OCR de texto (requer binário tesseract instalado)
+
+# Motor musical
+music21>=9.1
+mido>=1.3
+pretty_midi>=0.2.10

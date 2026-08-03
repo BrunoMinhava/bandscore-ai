@@ -1,0 +1,39 @@
+{
+  "name": "bandscore-ai",
+  "private": true,
+  "version": "0.1.0",
+  "description": "BandScore AI — reconhecimento, edição, separação e gestão de partituras",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "electron": "electron .",
+    "electron:dev": "concurrently -k \"vite\" \"electron .\""
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.51.0",
+    "@tonejs/midi": "^2.0.28",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.11.0",
+    "lucide-react": "^0.452.0",
+    "opensheetmusicdisplay": "^1.8.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.0",
+    "tailwind-merge": "^2.5.2",
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.0",
+    "electron": "^33.4.11",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.0"
+  }
+}
